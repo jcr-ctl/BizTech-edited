@@ -1,5 +1,4 @@
-import { RouteProp, useRoute } from '@react-navigation/native';
-import React from 'react';
+import { useLocalSearchParams } from 'expo-router';
 import {
   Dimensions,
   ScrollView,
@@ -7,10 +6,8 @@ import {
   Text
 } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
-import type { RootStackParamList } from '../_layout';
 
-//screen dimentsions
-const {width} = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const customersData = [
   {
@@ -42,28 +39,25 @@ const customersData = [
   },
 ];
 
-type CustomerDetailRouteProp = RouteProp<RootStackParamList, 'CustomerDetail'>;
+export default function CustomerDetailScreen() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  const customer = customersData.find((c) => c.id === id);
 
+  const chartData = {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    datasets: [
+      {
+        data: [20, 45, 28, 80, 99, 43],
+        strokeWidth: 2,
+      },
+    ],
+  };
 
-export default function CustomerDetailScreen(){
-    const route = useRoute<CustomerDetailRouteProp>();
-    const { id } = route.params;
-    const customer = customersData.find(c => c.id === id);
+  if (!customer) {
+    return <Text style={{ color: '#fff', padding: 16 }}>Customer not found</Text>;
+  }
 
-    //dummy data for chart
-    const chartData = {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-        datasets: [
-            {
-                data: [20,45,28,80,99,43],
-                strokeWidth: 2,
-            },
-        ],
-    };
-    
-    if (!customer) return <Text style = {{color: '#fff'}}>Customer not Found</Text>;
-
-    return (
+  return (
     <ScrollView style={styles.container}>
       <Text style={styles.name}>{customer.name}</Text>
       <Text style={styles.label}>Email: <Text style={styles.value}>{customer.email}</Text></Text>
@@ -98,5 +92,3 @@ const styles = StyleSheet.create({
   chartTitle: { color: '#fff', fontSize: 18, marginTop: 24, marginBottom: 8 },
   chart: { borderRadius: 8 },
 });
-
-
